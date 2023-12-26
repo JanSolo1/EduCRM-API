@@ -30,7 +30,6 @@ Endpoint: **/student/create**
 
 Payload:
 ```
-- uuid (Not Required)
 - student_id (Required)
 - student_first_name (Required)
 - student_middle_name (Optional)
