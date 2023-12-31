@@ -1,4 +1,5 @@
 mod api;
+mod db;
 
 use actix_web::{ web, App, HttpServer };
 use api::student_api::create_student;

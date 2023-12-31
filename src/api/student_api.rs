@@ -1,40 +1,28 @@
-use actix_web:: { post, web, Result, Responder}; 
-use futures_util::StreamExt as _;
+use actix_web:: { post, web, Result, Responder, HttpResponse}; 
 use uuid::Uuid;
-use serde::{ Serialize, Deserialize };
-use serde_json::Error;
-
-#[derive(Serialize, Deserialize, Debug)]
-struct Student {
-    uuid: Option<String>,
-    student_id: u32,
-    student_fail: bool,
-    student_name: String,
-}
-
-fn parse_payload(bytes: &[u8]) -> Result<Student, Error> {
-    let student: Student = serde_json::from_slice(bytes)?;
-    Ok(student)
-}
+use serde_json::json;
+use crate::db::student::Student;
+use crate::db::mdb::add_student;
 
 #[post("/create")]
-async fn create_student(mut body: web::Payload) -> Result<impl Responder> {
-    let id = Uuid::new_v4().to_string();
+async fn create_student(student: web::Json<Student>) -> Result<impl Responder> {
+    let uuid = Uuid::new_v4().to_string();
 
-    // we create a BytesMut (slice of memory to store bytes) which is the payload in our case
-    let mut bytes = web::BytesMut::new();
-    while let Some(item) = body.next().await {
-        bytes.extend_from_slice(&item?);
-    }
+    let student_json =json!({
+        "uuid": uuid.to_string(),
+        "student_id": &student.student_id,
+        "student_first_name": &student.student_first_name,
+        "student_middle_name": &student.student_middle_name,
+        "student_last_name": &student.student_last_name,
+        "student_dob": &student.student_dob,
+        "student_email": &student.student_email,
+        "student_phone": &student.student_phone.to_string(),
+        "student_gender": &student.student_gender,
+    });
 
-    let mut student = match parse_payload(&bytes) {
-        Ok(student) => student,
-        Err(e) => {
-            println!("Failed to parse student: {}", e);
-            return Err(actix_web::error::ErrorBadRequest("Invalid JSON"));
-        },
-    };
+    let student_struct: Student = serde_json::from_value(student_json.clone()).unwrap();
 
-    student.uuid = Some(id);
-    Ok(web::Json(student))
+    add_student(web::Json(student_struct)).await;
+
+    Ok(HttpResponse::Ok().json(student_json))
 }

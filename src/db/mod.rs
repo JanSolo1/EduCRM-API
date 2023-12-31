@@ -1,2 +1,2 @@
-pub mod  dynamodb;
+pub mod  mdb;
 pub mod student;
