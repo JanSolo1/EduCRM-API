@@ -12,3 +12,9 @@ pub struct Student {
     pub student_phone: String,
     pub student_gender: Option<String>,
 }
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct StudentSearch {
+    pub uuid: Option<String>,
+    pub student_id: Option<u32>,
+}
