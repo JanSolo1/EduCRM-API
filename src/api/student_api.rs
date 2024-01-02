@@ -25,7 +25,7 @@ async fn create_student(student: web::Json<Student>) -> Result<impl Responder> {
     let collection = get_collection("edu_crm_db", "datalake_dev_student").await;
 
     let student_doc = doc! {
-        "uuid": &student.uuid,
+        "uuid": uuid.to_string(),
         "student_id": &student.student_id,
         "student_first_name": &student.student_first_name,
         "student_middle_name": &student.student_middle_name,
