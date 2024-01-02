@@ -1,8 +1,10 @@
-use actix_web:: { post, web, Result, Responder, HttpResponse}; 
+use actix_web:: { post, get, web, Result, Responder, HttpResponse}; 
 use uuid::Uuid;
 use serde_json::json;
-use crate::db::student::Student;
-use crate::db::mdb::add_student;
+use mongodb::bson::doc;
+use mongodb::bson;
+use crate::db::helpers::Student;
+use crate::db::mdb::get_collection;
 
 #[post("/create")]
 async fn create_student(student: web::Json<Student>) -> Result<impl Responder> {
@@ -20,9 +22,34 @@ async fn create_student(student: web::Json<Student>) -> Result<impl Responder> {
         "student_gender": &student.student_gender,
     });
 
-    let student_struct: Student = serde_json::from_value(student_json.clone()).unwrap();
+    let collection = get_collection("edu_crm_db", "datalake_dev_student").await;
 
-    add_student(web::Json(student_struct)).await;
+    let student_doc = doc! {
+        "uuid": &student.uuid,
+        "student_id": &student.student_id,
+        "student_first_name": &student.student_first_name,
+        "student_middle_name": &student.student_middle_name,
+        "student_last_name": &student.student_last_name,
+        "student_dob": &student.student_dob,
+        "student_email": &student.student_email,
+        "student_phone": &student.student_phone,
+        "student_gender": &student.student_gender,
+    };
+    
+    let student_struct: Student = bson::from_bson(bson::Bson::Document(student_doc.clone())).unwrap();
+
+    let res = match collection.insert_one(&student_struct, None).await {
+        Ok(res) => res,
+        Err(e) => panic!("Error inserting document: {}", e),
+    };
+    println!("inserted document with id {}", res.inserted_id);
 
     Ok(HttpResponse::Ok().json(student_json))
 }
+
+// #[get("/get")]
+// async fn get_student() -> Result<impl Responder> {
+
+//     student
+//     Ok(HttpResponse::Ok().json(json!({"message": "get student"})))
+// }
