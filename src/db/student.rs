@@ -108,14 +108,16 @@ pub async fn update_student_in_db(student: Student) -> Result<(), Box<dyn std::e
         &var("MONGODB_DB_STUDENTS_COLLECTION").expect("MONGODB_DB_STUDENTS_COLLECTION must be set"))
         .await;
 
-    let filter = doc! { "uuid": student.uuid };
+    println!("before cleaning data");
+    let filter = doc! { "uuid": &student.uuid };
     let update = doc! { 
         "$set": 
             { 
-                "student_first_name": student.student_first_name, 
+                "student_first_name": &student.student_first_name, 
             } 
         };
-    collection.update_one(filter, update, None).await?;
-
+    println!("before update");
+    let result = collection.update_one(filter, update, None).await?;
+    println!("before update");
     Ok(())
 }

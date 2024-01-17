@@ -38,6 +38,7 @@ async fn get_student(student_search: web::Query<StudentSearch>) -> Result<impl R
 #[patch("/update")]
 async fn update_student(student: web::Json<Student>) -> Result<impl Responder> {
     let uuid = student.uuid.clone();
+    println!("un patch func");
     match update_student_in_db(student.into_inner()).await {
         Ok(_) => Ok(HttpResponse::Ok().json(json!({"message": "Student updated successfully", "uuid": uuid}))),
         Err(e) => Ok(HttpResponse::InternalServerError().json(json!({"message": "An error occurred", "error": e.to_string()}))),
