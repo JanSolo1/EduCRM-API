@@ -10,6 +10,7 @@ async fn main() -> std::io::Result<()> {
         App::new().service(
             web::scope("/student")
                 .service(create_student)
+                .service(students_list)
                 .service(get_student)
                 .service(update_student)
         )
