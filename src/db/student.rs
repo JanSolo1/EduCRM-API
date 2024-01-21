@@ -53,7 +53,7 @@ pub async fn get_student_by_id(student_id: String) -> Result<Option<Student>, Bo
     Ok(result)
 }
 
-pub async fn update_student_by_id(student: Student) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn update_student_by_id(student: Student) -> Result<Option<Student>, Box<dyn std::error::Error>> {
     dotenv::dotenv().ok();
     let collection = get_collection(
         &var("MONGODB_DB_NAME").expect("MONGODB_DB_NAME must be set"), 
@@ -67,5 +67,5 @@ pub async fn update_student_by_id(student: Student) -> Result<(), Box<dyn std::e
 
     let result = collection.update_one(filter, update, None).await?;
 
-    Ok(())
+    Ok(Some(student))
 }
