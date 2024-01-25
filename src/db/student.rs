@@ -53,7 +53,7 @@ pub async fn get_student_by_id(student_id: String) -> Result<Option<Student>, Bo
     Ok(result)
 }
 
-pub async fn update_student_by_id(student: Student) -> Result<Option<Student>, Box<dyn std::error::Error>> {
+pub async fn update_student_by_id(student_id: String, student: Student) -> Result<Option<Student>, Box<dyn std::error::Error>> {
     dotenv::dotenv().ok();
     let collection = get_collection(
         &var("MONGODB_DB_NAME").expect("MONGODB_DB_NAME must be set"), 
@@ -62,10 +62,24 @@ pub async fn update_student_by_id(student: Student) -> Result<Option<Student>, B
 
     let student_doc = to_document(&student)?;
 
-    let filter = doc! { "student_id": &student.student_id };
+    let filter = doc! { "student_id": student_id };
     let update = doc! { "$set": student_doc};
 
     let result = collection.update_one(filter, update, None).await?;
 
     Ok(Some(student))
+}
+
+pub async fn delete_student_by_id(student_id: String) -> Result<Option<Student>, Box<dyn std::error::Error>> {
+    dotenv::dotenv().ok();
+    let collection = get_collection(
+        &var("MONGODB_DB_NAME").expect("MONGODB_DB_NAME must be set"), 
+        &var("MONGODB_DB_STUDENTS_COLLECTION").expect("MONGODB_DB_STUDENTS_COLLECTION must be set"))
+        .await;
+
+    println!("Hey I get here: {:?}", student_id);
+    let filter = doc! { "student_id": student_id };
+    let result = collection.find_one_and_delete(filter, None).await?;
+
+    Ok(result)
 }

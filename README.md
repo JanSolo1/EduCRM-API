@@ -8,7 +8,6 @@ The student field is only for students, there are other objects for interacting 
 Here is the student object
 ```json
 {
-    "uuid": "auto generated string",
     "student_id": "000000000000",
     "student_first_name": "First Name",
     "student_middle_name": "Middle Name",
@@ -20,10 +19,11 @@ Here is the student object
 ## Student Requests
 > Scope: "/student"
 
-|Function          | Request Method   | Endpoint      |
-|   -----------    | :-------------:  |:------------- |
-|      Create      |        POST      |    /create    |
-|       List       |        GET       |     /get      |
-|       Read       |        GET       |     /get      |
+|Function          | Request Method   |       Endpoint       |
+|   -----------    | :-------------:  |    :-------------    |
+|      Create      |        POST      |        /create       |
+|       List       |        GET       |         /get         |
+|       Read       |        GET       |   /get/{student_id}  |
+|      Update      |        GET       | /update/{student_id} |
+|      Delete      |       DELETE     | /delete/{student_id} |
 
-> Note: The "/get" endpoint serves dual purposes. With parameters, it fetches a specific student's details. Without parameters, it returns a list of all students.

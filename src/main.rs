@@ -13,6 +13,7 @@ async fn main() -> std::io::Result<()> {
                 .service(students_list)
                 .service(get_student)
                 .service(update_student)
+                .service(delete_student)
         )
     })
     .bind(("127.0.0.1",4000))?
